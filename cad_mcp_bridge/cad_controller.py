@@ -70,12 +70,12 @@ class CADController:
                     app_name = "中望CAD"
 
                 # 尝试连接到已运行的CAD实例
-                logger.info(f"尝试连接现有{app_name}实例...")
+                logger.info("尝试连接现有%s实例...", app_name)
                 try:
                     self.app = win32com.client.GetActiveObject(app_id)
-                    logger.info(f"成功连接到已运行的{app_name}实例")
+                    logger.info("成功连接到已运行的%s实例", app_name)
                 except Exception as e:
-                    logger.info(f"未找到运行中的{app_name}实例，将尝试启动新实例: {str(e)}")
+                    logger.info("未找到运行中的%s实例，将尝试启动新实例: %s", app_name, str(e))
                     raise
 
                 # 已在上面的代码中处理
@@ -91,7 +91,7 @@ class CADController:
                 except Exception as doc_ex:
                     logger.debug("Exception in CAD COM operation")
                     # 如果获取文档失败，强制创建新文档
-                    logger.warning(f"获取文档失败，尝试创建新文档: {str(doc_ex)}")
+                    logger.warning("获取文档失败，尝试创建新文档: %s", str(doc_ex))
                     try:
                         # 关闭所有打开的文档
                         for i in range(self.app.Documents.Count):
@@ -103,13 +103,13 @@ class CADController:
                         # 创建新文档
                         self.doc = self.app.Documents.Add()
                     except Exception as new_doc_ex:
-                        logger.error(f"创建新文档失败: {str(new_doc_ex)}")
+                        logger.error("创建新文档失败: %s", str(new_doc_ex))
                         raise
 
             except Exception as app_ex:
                 logger.debug("Exception in CAD COM operation")
                 # 如果连接失败，启动一个新实例
-                logger.info(f"连接失败，正在启动新的CAD实例: {str(app_ex)}")
+                logger.info("连接失败，正在启动新的CAD实例: %s", str(app_ex))
                 try:
                     # 根据配置的CAD类型启动相应的应用程序
                     app_id = "AutoCAD.Application"
@@ -128,7 +128,7 @@ class CADController:
                         app_id = "ZWCAD.Application"
                         app_name = "中望CAD"
 
-                    logger.info(f"正在启动{app_name}实例...")
+                    logger.info("正在启动%s实例...", app_name)
                     self.app = win32com.client.Dispatch(app_id)
                     self.app.Visible = True
 
@@ -140,7 +140,7 @@ class CADController:
                     # self.doc = self.app.Documents.Add()
                     self.doc = self.app.ActiveDocument
                 except Exception as new_app_ex:
-                    logger.error(f"启动新CAD实例失败: {str(new_app_ex)}")
+                    logger.error("启动新CAD实例失败: %s", str(new_app_ex))
                     raise
 
             # 额外安全检查和等待
@@ -152,16 +152,16 @@ class CADController:
             # 尝试读取文档属性以验证其有效性
             try:
                 name = self.doc.Name
-                logger.info(f"文档名称: {name}")
+                logger.info("文档名称: %s", name)
             except Exception as name_ex:
-                logger.error(f"无法读取文档名称: {str(name_ex)}")
+                logger.error("无法读取文档名称: %s", str(name_ex))
                 raise Exception("文档对象无效")
 
             logger.info("CAD已成功启动和准备")
             return True
 
         except Exception as e:
-            logger.error(f"启动CAD失败: {str(e)}")
+            logger.error("启动CAD失败: %s", str(e))
             return False
         finally:
             # 清理旧实例
@@ -188,11 +188,11 @@ class CADController:
 
             # 保存文件
             self.doc.SaveAs(file_path)
-            logger.info(f"图纸已保存到: {file_path}")
+            logger.info("图纸已保存到: %s", file_path)
 
             return True
         except Exception as e:
-            logger.error(f"保存图纸失败: {str(e)}")
+            logger.error("保存图纸失败: %s", str(e))
             return False
 
     def refresh_view(self) -> None:
@@ -201,7 +201,7 @@ class CADController:
             try:
                 self.doc.Regen(1)  # acAllViewports = 1
             except Exception as e:
-                logger.error(f"刷新视图失败: {str(e)}")
+                logger.error("刷新视图失败: %s", str(e))
 
     def validate_lineweight(self, lineweight) -> int:
         """验证并返回有效的线宽值
@@ -221,7 +221,7 @@ class CADController:
         if lineweight in self.valid_lineweights:
             return lineweight
         else:
-            logger.warning(f"线宽值 {lineweight} 无效，将使用默认值 0")
+            logger.warning("线宽值 %s 无效，将使用默认值 0", lineweight)
             return 0
 
     def draw_line(self, start_point: tuple[float, float, float],
@@ -263,11 +263,11 @@ class CADController:
             # 刷新视图
             self.refresh_view()
 
-            logger.debug(f"已绘制直线: 起点{start_point}, 终点{end_point}, 图层{layer if layer else '默认'}, 颜色{color if color is not None else '默认'}")
+            logger.debug("已绘制直线: 起点%s, 终点%s, 图层%s, 颜色%s", start_point, end_point, layer if layer else '默认', color if color is not None else '默认')
             return line
 
         except Exception as e:
-            logger.error(f"绘制直线时出错: {str(e)}")
+            logger.error("绘制直线时出错: %s", str(e))
             return None
 
     def draw_circle(self, center: tuple[float, float, float],
@@ -305,11 +305,11 @@ class CADController:
             # 刷新视图
             self.refresh_view()
 
-            logger.debug(f"已绘制圆: 中心{center}, 半径{radius}, 图层{layer if layer else '默认'}, 颜色{color if color is not None else '默认'}")
+            logger.debug("已绘制圆: 中心%s, 半径%s, 图层%s, 颜色%s", center, radius, layer if layer else '默认', color if color is not None else '默认')
             return circle
 
         except Exception as e:
-            logger.error(f"绘制圆时出错: {str(e)}")
+            logger.error("绘制圆时出错: %s", str(e))
             return None
 
     def draw_arc(self, center: tuple[float, float, float],
@@ -351,10 +351,10 @@ class CADController:
             # 刷新视图
             self.refresh_view()
 
-            logger.debug(f"已绘制圆弧: 中心{center}, 半径{radius}, 起始角度{start_angle}, 结束角度{end_angle}, 图层{layer if layer else '默认'}, 颜色{color if color is not None else '默认'}")
+            logger.debug("已绘制圆弧: 中心%s, 半径%s, 起始角度%s, 结束角度%s, 图层%s, 颜色%s", center, radius, start_angle, end_angle, layer if layer else '默认', color if color is not None else '默认')
             return arc
         except Exception as e:
-            logger.error(f"绘制圆弧失败: {str(e)}")
+            logger.error("绘制圆弧失败: %s", str(e))
             return None
 
     def draw_ellipse(self, center: tuple[float, float, float],
@@ -405,10 +405,10 @@ class CADController:
             # 刷新视图
             self.refresh_view()
 
-            logger.debug(f"已绘制椭圆: 中心{center}, 长轴{major_axis}, 短轴{minor_axis}, 旋转角度{rotation}, 图层{layer if layer else '默认'}, 颜色{color if color is not None else '默认'}")
+            logger.debug("已绘制椭圆: 中心%s, 长轴%s, 短轴%s, 旋转角度%s, 图层%s, 颜色%s", center, major_axis, minor_axis, rotation, layer if layer else '默认', color if color is not None else '默认')
             return ellipse
         except Exception as e:
-            logger.error(f"绘制椭圆失败: {str(e)}")
+            logger.error("绘制椭圆失败: %s", str(e))
             return None
 
     def draw_polyline(self, points: list[tuple[float, float, float]], closed: bool = False, layer: str = None, color: int = None, lineweight=None) -> Any:
@@ -453,10 +453,10 @@ class CADController:
             # 刷新视图
             self.refresh_view()
 
-            logger.debug(f"已绘制多段线: {len(points)}个点, {'闭合' if closed else '不闭合'}, 图层{layer if layer else '默认'}, 颜色{color if color is not None else '默认'}")
+            logger.debug("已绘制多段线: %s个点, %s, 图层%s, 颜色%s", len(points), '闭合' if closed else '不闭合', layer if layer else '默认', color if color is not None else '默认')
             return polyline
         except Exception as e:
-            logger.error(f"绘制多段线时出错: {str(e)}")
+            logger.error("绘制多段线时出错: %s", str(e))
             return None
 
     def draw_rectangle(self, corner1: tuple[float, float, float],
@@ -488,7 +488,7 @@ class CADController:
             # 使用多段线绘制矩形
             return self.draw_polyline(points, True, layer, color, lineweight)
         except Exception as e:
-            logger.error(f"绘制矩形时出错: {str(e)}")
+            logger.error("绘制矩形时出错: %s", str(e))
             return None
 
     def draw_text(self, position: tuple[float, float, float],
@@ -527,10 +527,10 @@ class CADController:
             # 刷新视图
             self.refresh_view()
 
-            logger.debug(f"已添加文本: '{text}', 位置{position}, 高度{height}, 旋转{rotation}度, 图层{layer if layer else '默认'}, 颜色{color if color is not None else '默认'}")
+            logger.debug("已添加文本: '%s', 位置%s, 高度%s, 旋转%s度, 图层%s, 颜色%s", text, position, height, rotation, layer if layer else '默认', color if color is not None else '默认')
             return text_obj
         except Exception as e:
-            logger.error(f"添加文本时出错: {str(e)}")
+            logger.error("添加文本时出错: %s", str(e))
             return None
 
     def draw_hatch(self, points: list[tuple[float, float, float]],
@@ -590,10 +590,10 @@ class CADController:
             # 刷新视图
             self.refresh_view()
 
-            logger.debug(f"已创建填充: 图案 {pattern_name}, 比例 {scale}, 图层{layer if layer else '默认'}, 颜色{color if color is not None else '默认'}")
+            logger.debug("已创建填充: 图案 %s, 比例 %s, 图层%s, 颜色%s", pattern_name, scale, layer if layer else '默认', color if color is not None else '默认')
             return hatch
         except Exception as e:
-            logger.error(f"创建填充时出错: {str(e)}")
+            logger.error("创建填充时出错: %s", str(e))
             return None
 
     def zoom_extents(self) -> bool:
@@ -606,7 +606,7 @@ class CADController:
             logger.info("已缩放视图以显示所有对象")
             return True
         except Exception as e:
-            logger.error(f"缩放视图时出错: {str(e)}")
+            logger.error("缩放视图时出错: %s", str(e))
             return False
 
     def close(self) -> None:
@@ -657,10 +657,10 @@ class CADController:
 
             # 设置为当前图层
             self.doc.ActiveLayer = new_layer
-            logger.info(f"已创建新图层: {layer_name}")  #, 颜色: {color}
+            logger.info("已创建新图层: %s", layer_name)  #, 颜色: {color}
             return True
         except Exception as e:
-            logger.error(f"创建图层时出错: {str(e)}")
+            logger.error("创建图层时出错: %s", str(e))
             return False
 
     def add_dimension(self, start_point: tuple[float, float, float],
@@ -715,9 +715,9 @@ class CADController:
                 # 刷新视图
                 self.refresh_view()
 
-                logger.info(f"已添加标注: 从 {start_point} 到 {end_point}, 图层{layer if layer else '默认'}")
+                logger.info("已添加标注: 从 %s 到 %s, 图层%s", start_point, end_point, layer if layer else '默认')
                 return dimension
             except Exception as e:
-                logger.error(f"添加标注时出错: {str(e)}")
+                logger.error("添加标注时出错: %s", str(e))
                 return None
 
