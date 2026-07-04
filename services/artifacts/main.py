@@ -1,9 +1,10 @@
 """Artifacts service — manage output files and artifacts"""
 from __future__ import annotations
-import sys, os
+import sys
+import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-from fastapi import FastAPI, HTTPException
-from shared.models import ArtifactList, ArtifactInfo, JobStatus
+from fastapi import FastAPI
+from shared.models import ArtifactList, JobStatus
 
 app = FastAPI(title="Artifacts Service", version="0.1.0")
 

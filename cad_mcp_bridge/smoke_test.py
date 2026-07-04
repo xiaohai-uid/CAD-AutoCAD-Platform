@@ -1,6 +1,4 @@
 """Minimal COM smoke test for AutoCAD 2026"""
-import sys
-import traceback
 
 def test_connection():
     try:
@@ -20,14 +18,13 @@ def test_connection():
         return False
 
 def test_registry():
-    import win32com.client
     prog_ids = ["AutoCAD.Application", "AutoCAD.Application.25", "AutoCAD.Application.25.1"]
     for pid in prog_ids:
         try:
             from win32com.client import gencache
             clsid = gencache.ProgIDToCLSID(pid)
             print(f"   {pid} -> CLSID: {clsid}")
-        except:
+        except Exception:
             print(f"   {pid} -> NOT REGISTERED")
 
 if __name__ == "__main__":

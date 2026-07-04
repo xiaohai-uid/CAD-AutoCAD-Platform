@@ -102,7 +102,6 @@ class VisionEngine:
         """Execute the detection pipeline (requires ``cv2``)."""
         try:
             import cv2
-            import numpy as np
         except ImportError:
             return VisionResult(
                 error="OpenCV (cv2) is not installed. pip install opencv-python"
@@ -139,7 +138,6 @@ class VisionEngine:
 def _detect_lines(result: VisionResult, edges: object) -> None:
     """Populate *result.lines* from Canny edges via HoughLinesP."""
     import cv2
-    import numpy as np
 
     lines = cv2.HoughLinesP(
         edges,
@@ -207,7 +205,6 @@ def _detect_circles(result: VisionResult, blurred: object, gray: object,
 def _detect_rects(result: VisionResult, edges: object) -> None:
     """Populate *result.rects* via contour detection + approxPolyDP."""
     import cv2
-    import numpy as np
 
     contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL,
                                    cv2.CHAIN_APPROX_SIMPLE)

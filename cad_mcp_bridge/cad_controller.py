@@ -3,7 +3,7 @@ import math
 import time
 import os
 import json
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, List, Tuple
 
 # 直接读取config.json文件
 config_path = os.path.join(os.path.dirname(__file__), 'config.json')
@@ -95,7 +95,7 @@ class CADController:
                         for i in range(self.app.Documents.Count):
                             try:
                                 self.app.Documents.Item(0).Close(False)  # 不保存
-                            except:
+                            except Exception:
                                 pass
                         
                         # 创建新文档
@@ -165,7 +165,7 @@ class CADController:
             if old_app is not None:
                 try:
                     del old_app
-                except:
+                except Exception:
                     pass
     
         
@@ -613,7 +613,7 @@ class CADController:
             if self.app is not None:
                 del self.app
             pythoncom.CoUninitialize()
-        except:
+        except Exception:
             pass
 
     

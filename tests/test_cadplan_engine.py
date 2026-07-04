@@ -4,7 +4,7 @@ import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from services.cadplan.engine import CADPlanEngine, Plan
+from services.cadplan.engine import CADPlanEngine
 
 
 class TestCADPlanEngine:

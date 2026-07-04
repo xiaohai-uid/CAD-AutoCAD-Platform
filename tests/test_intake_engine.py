@@ -1,7 +1,7 @@
-import sys, os
+import sys
+import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from services.intake.engine import IntakeEngine, ParsedContext
-from shared.models import OutputLevel
+from services.intake.engine import IntakeEngine
 
 
 def test_parse_rectangle_dimensions():

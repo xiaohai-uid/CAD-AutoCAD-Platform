@@ -1,6 +1,7 @@
 """DWG Scan service — parse and extract data from existing DWG files"""
 from __future__ import annotations
-import sys, os
+import sys
+import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from fastapi import FastAPI
 from shared.models import VisionRequest, JobResponse, JobStatus
