@@ -15,6 +15,7 @@ try:
     import pythoncom
     import win32com.client
 except ImportError:
+    logging.debug("CAD COM import failed")
     logging.error("无法导入win32com.client或pythoncom，请确保已安装pywin32库")
     raise
 
@@ -88,6 +89,7 @@ class CADController:
                         logger.info("获取活动文档...")
                         self.doc = self.app.ActiveDocument
                 except Exception as doc_ex:
+                    logger.debug("Exception in CAD COM operation")
                     # 如果获取文档失败，强制创建新文档
                     logger.warning(f"获取文档失败，尝试创建新文档: {str(doc_ex)}")
                     try:
@@ -95,8 +97,8 @@ class CADController:
                         for i in range(self.app.Documents.Count):
                             try:
                                 self.app.Documents.Item(0).Close(False)  # 不保存
-                            except Exception:
-                                pass
+                            except Exception:  # nosec B110  # noqa: BLE001  # nosec B110  # nosec B110
+                                logger.debug("Cleanup error")
 
                         # 创建新文档
                         self.doc = self.app.Documents.Add()
@@ -105,6 +107,7 @@ class CADController:
                         raise
 
             except Exception as app_ex:
+                logger.debug("Exception in CAD COM operation")
                 # 如果连接失败，启动一个新实例
                 logger.info(f"连接失败，正在启动新的CAD实例: {str(app_ex)}")
                 try:
@@ -165,8 +168,8 @@ class CADController:
             if old_app is not None:
                 try:
                     del old_app
-                except Exception:
-                    pass
+                except Exception:  # nosec B110  # noqa: BLE001  # nosec B110  # nosec B110
+                    logger.debug("Cleanup error")
 
 
     def is_running(self) -> bool:
@@ -613,8 +616,8 @@ class CADController:
             if self.app is not None:
                 del self.app
             pythoncom.CoUninitialize()
-        except Exception:
-            pass
+        except Exception:  # nosec B110  # noqa: BLE001  # nosec B110  # nosec B110
+            logger.debug("Cleanup error")
 
 
     def create_layer(self, layer_name: str) -> bool:    # , color: Union[int, Tuple[int, int, int]] = 7

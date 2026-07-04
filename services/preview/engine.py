@@ -1,8 +1,11 @@
 """PreviewEngine — generate visual previews (screenshots / PDF) from AutoCAD."""
 from __future__ import annotations
 
+import logging
 import os
 from dataclasses import dataclass
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Data class
@@ -37,6 +40,7 @@ class PreviewEngine:
             self.controller = win32com.client.GetActiveObject("AutoCAD.Application")
             return True
         except Exception:
+            logger.debug("Preview error")
             return False
 
     # -- screenshot ---------------------------------------------------------
@@ -83,6 +87,7 @@ class PreviewEngine:
                 format=format,
             )
         except Exception as exc:
+            logger.debug("Preview error")
             return PreviewResult(
                 success=False,
                 file_path=file_path,
@@ -122,6 +127,7 @@ class PreviewEngine:
                 format="pdf",
             )
         except Exception as exc:
+            logger.debug("Preview error")
             return PreviewResult(
                 success=False,
                 file_path=file_path,
