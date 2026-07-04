@@ -5,6 +5,9 @@ import math
 import os
 from dataclasses import dataclass, field
 
+import cv2
+import numpy as np
+
 # ---------------------------------------------------------------------------
 # Detected primitives
 # ---------------------------------------------------------------------------
@@ -98,12 +101,6 @@ class VisionEngine:
     @staticmethod
     def _analyze_cv2(image_path: str) -> VisionResult:
         """Execute the detection pipeline (requires ``cv2``)."""
-        try:
-            import cv2
-        except ImportError:
-            return VisionResult(
-                error="OpenCV (cv2) is not installed. pip install opencv-python"
-            )
 
         img = cv2.imread(image_path)
         if img is None:
@@ -135,7 +132,6 @@ class VisionEngine:
 
 def _detect_lines(result: VisionResult, edges: object) -> None:
     """Populate *result.lines* from Canny edges via HoughLinesP."""
-    import cv2
 
     lines = cv2.HoughLinesP(
         edges,
@@ -171,8 +167,6 @@ def _detect_lines(result: VisionResult, edges: object) -> None:
 def _detect_circles(result: VisionResult, blurred: object, gray: object,
                     height: int, width: int) -> None:
     """Populate *result.circles* via HoughCircles."""
-    import cv2
-    import numpy as np
 
     circles = cv2.HoughCircles(
         blurred,
@@ -202,7 +196,6 @@ def _detect_circles(result: VisionResult, blurred: object, gray: object,
 
 def _detect_rects(result: VisionResult, edges: object) -> None:
     """Populate *result.rects* via contour detection + approxPolyDP."""
-    import cv2
 
     contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL,
                                    cv2.CHAIN_APPROX_SIMPLE)
