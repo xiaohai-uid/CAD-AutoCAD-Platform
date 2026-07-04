@@ -1,9 +1,13 @@
 """DWG Scan engine — COM-based parsing of AutoCAD DWG files."""
 from __future__ import annotations
 
+import logging
+
 import os
 from dataclasses import dataclass, field
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Data models
@@ -96,8 +100,8 @@ class DwgScanEngine:
                                 val = getattr(com_entity, attr, None)
                                 if val is not None:
                                     props[attr] = _com_value(val)
-                            except Exception:
-                                pass
+                            except Exception:  # noqa: BLE001
+                                logger.debug("DWG scan error")
 
                         entities.append(DwgEntity(
                             type=str(ent_type),
@@ -106,8 +110,8 @@ class DwgScanEngine:
                         ))
                         if ent_layer:
                             layers_set.add(str(ent_layer))
-                    except Exception:
-                        # Skip any entity that fails to read
+                    except Exception:  # noqa: BLE001
+                        logger.debug("Skipping entity that failed to read")
                         continue
 
                 return DwgContent(
@@ -118,8 +122,8 @@ class DwgScanEngine:
             finally:
                 try:
                     doc.Close(False)  # do not save changes
-                except Exception:
-                    pass
+                except Exception:  # noqa: BLE001
+                    logger.debug("DWG scan error")
         except Exception:
             return DwgContent()
 
@@ -138,7 +142,8 @@ class DwgScanEngine:
             try:
                 if all(ent.properties.get(k) == v for k, v in query.items()):
                     results.append(ent)
-            except Exception:
+            except Exception:  # noqa: BLE001
+                logger.debug("Skipping entity")
                 continue
         return results
 
@@ -162,6 +167,6 @@ def _com_value(val: Any) -> Any:
             if hasattr(val, "Count"):  # COM collection
                 return list(val)
             return tuple(float(v) for v in val)
-    except Exception:
-        pass
+    except Exception:  # noqa: BLE001
+        logger.debug("DWG scan error")
     return val
