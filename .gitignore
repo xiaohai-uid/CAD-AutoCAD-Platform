@@ -7,3 +7,54 @@ output/
 *.egg-info/
 dist/
 build/
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor/IDE
+.env
+*.log
+*.tmp
+.mypy_cache/
+.idea/
+.vscode/
+*.swp
+*~
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Output
+output/
+
+# Superpowers
+.superpowers/
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
