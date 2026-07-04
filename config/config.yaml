@@ -1,0 +1,40 @@
+services:
+  gateway:
+    host: 127.0.0.1
+    port: 8000
+  intake:
+    host: 127.0.0.1
+    port: 8001
+  vision:
+    host: 127.0.0.1
+    port: 8002
+  cadplan:
+    host: 127.0.0.1
+    port: 8003
+  validation:
+    host: 127.0.0.1
+    port: 8004
+  cad_com:
+    host: 127.0.0.1
+    port: 8005
+  preview:
+    host: 127.0.0.1
+    port: 8006
+  dwg_scan:
+    host: 127.0.0.1
+    port: 8007
+  artifacts:
+    host: 127.0.0.1
+    port: 8008
+
+cad:
+  default_unit: mm
+  com_timeout: 30
+  com_progid: AutoCAD.Application
+
+output:
+  dir: D:/Projects/cad-direct-control-platform/output
+
+logging:
+  level: INFO
+  format: '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
