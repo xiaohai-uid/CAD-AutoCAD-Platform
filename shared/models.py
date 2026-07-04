@@ -1,7 +1,8 @@
 """Shared Pydantic models for CAD Direct Control Platform"""
 from __future__ import annotations
+
 from enum import Enum
-from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -37,14 +38,14 @@ class CreateJobRequest(BaseModel):
     files: list[str] = []
     output_level: OutputLevel = OutputLevel.sketch
     declared_unit: str = "mm"
-    declared_scale: Optional[float] = None
-    context_id: Optional[str] = None
+    declared_scale: float | None = None
+    context_id: str | None = None
 
 
 class JobResponse(BaseModel):
     job_id: str
     status: JobStatus
-    next_action: Optional[str] = None
+    next_action: str | None = None
     assumptions: list[dict] = []
     questions: list[str] = []
     created_at: str = ""
@@ -66,24 +67,24 @@ class ErrorDetail(BaseModel):
 
 class ArtifactInfo(BaseModel):
     path: str
-    size_bytes: Optional[int] = None
+    size_bytes: int | None = None
 
 
 class ArtifactList(BaseModel):
     job_id: str
     status: JobStatus
     created_at: str = ""
-    completed_at: Optional[str] = None
+    completed_at: str | None = None
     artifacts: dict[str, ArtifactInfo] = {}
 
 
 class PlanRequest(BaseModel):
     user_request: str
-    vision_analysis_id: Optional[str] = None
-    dwg_scan_id: Optional[str] = None
+    vision_analysis_id: str | None = None
+    dwg_scan_id: str | None = None
     output_level: OutputLevel = OutputLevel.sketch
     unit: str = "mm"
-    declared_scale: Optional[float] = None
+    declared_scale: float | None = None
 
 
 class IntakeRequest(BaseModel):

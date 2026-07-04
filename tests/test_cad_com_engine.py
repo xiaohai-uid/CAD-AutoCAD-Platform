@@ -1,9 +1,11 @@
 """Tests for CadComEngine"""
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from services.cad_com.engine import CadComEngine
 from services.cadplan.engine import Plan
+
 
 def test_execute_empty_plan():
     engine = CadComEngine()

@@ -1,11 +1,14 @@
 """Validation service — validate CAD plans before execution"""
 from __future__ import annotations
-import sys
+
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from fastapi import FastAPI
-from shared.models import ValidationRequest, JobResponse, JobStatus
+
+from shared.models import JobResponse, JobStatus, ValidationRequest
 
 app = FastAPI(title="Validation Service", version="0.1.0")
 

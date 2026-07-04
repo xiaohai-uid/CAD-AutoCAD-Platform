@@ -7,15 +7,22 @@ on:
     branches: [main, master]
 
 jobs:
+  lint:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-ruff@v1
+      - name: Run Ruff
+        run: ruff check --output-format=concise . --exclude=.venv
+
   test:
-    # 该项目依赖 pywin32 (Windows COM)，只能在 Windows 上运行
     runs-on: windows-latest
     strategy:
       matrix:
         python-version: ["3.11", "3.12"]
-
+    needs: lint
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5

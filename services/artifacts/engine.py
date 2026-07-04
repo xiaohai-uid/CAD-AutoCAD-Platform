@@ -1,12 +1,12 @@
 """ArtifactManager — manage CAD output artifacts with SQLite storage."""
 
 from __future__ import annotations
+
 import json
 import sqlite3
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Optional
 
 
 @dataclass
@@ -26,7 +26,7 @@ class ArtifactManager:
     a persistent file-based database.
     """
 
-    def __init__(self, db_path: Optional[str | Path] = None) -> None:
+    def __init__(self, db_path: str | Path | None = None) -> None:
         self._db_path = db_path
         self._conn: sqlite3.Connection | None = None
 
@@ -63,7 +63,7 @@ class ArtifactManager:
 
     def store(self, job_id: str, files: dict[str, str], metadata: dict | None = None) -> ArtifactRecord:
         """Store an artifact record (INSERT OR REPLACE)."""
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         record = ArtifactRecord(
             job_id=job_id,
             files=files,
@@ -78,7 +78,7 @@ class ArtifactManager:
         self.conn.commit()
         return record
 
-    def get(self, job_id: str) -> Optional[ArtifactRecord]:
+    def get(self, job_id: str) -> ArtifactRecord | None:
         """Retrieve a record by *job_id*, or *None* if not found."""
         row = self.conn.execute(
             "SELECT job_id, files_json, created_at, metadata_json FROM artifacts WHERE job_id = ?",

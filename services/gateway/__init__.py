@@ -1,3 +1,4 @@
 """Gateway service — orchestrator entry point."""
-from .engine import OrchestratorEngine, JobStore
+from .engine import JobStore, OrchestratorEngine
+
 __all__ = ["OrchestratorEngine", "JobStore"]

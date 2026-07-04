@@ -1,4 +1,10 @@
 """Vision service — analyze images for CAD geometry."""
-from .engine import VisionEngine, VisionResult, DetectedLine, DetectedCircle, DetectedRect
+from .engine import (
+    DetectedCircle,
+    DetectedLine,
+    DetectedRect,
+    VisionEngine,
+    VisionResult,
+)
 
 __all__ = ["VisionEngine", "VisionResult", "DetectedLine", "DetectedCircle", "DetectedRect"]

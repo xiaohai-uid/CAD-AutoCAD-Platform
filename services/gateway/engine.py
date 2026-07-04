@@ -1,15 +1,15 @@
 """GatewayEngine — full 11-step job orchestration coordinator."""
 from __future__ import annotations
-import uuid
+
 import logging
-from typing import Optional
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from shared.models import CreateJobRequest, JobResponse, JobStatus
-from services.intake.engine import IntakeEngine
 from services.cadplan.engine import CADPlanEngine
+from services.intake.engine import IntakeEngine
 from services.validation.engine import ValidationEngine
+from shared.models import CreateJobRequest, JobResponse, JobStatus
 
 logger = logging.getLogger("gateway_engine")
 
@@ -71,10 +71,10 @@ class OrchestratorEngine:
         self.store.jobs[job_id] = resp
         return resp
 
-    def get_job(self, job_id: str) -> Optional[JobResponse]:
+    def get_job(self, job_id: str) -> JobResponse | None:
         return self.store.jobs.get(job_id)
 
-    def confirm_job(self, job_id: str, confirmations: dict) -> Optional[JobResponse]:
+    def confirm_job(self, job_id: str, confirmations: dict) -> JobResponse | None:
         job = self.store.jobs.get(job_id)
         if job is None:
             return None

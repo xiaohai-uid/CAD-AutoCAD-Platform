@@ -60,3 +60,15 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 addopts = "-v"
+
+# Ruff configuration
+[tool.ruff]
+target-version = "py311"
+exclude = [".venv", ".git", "__pycache__", ".pytest_cache", ".superpowers", "build", "dist"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E501", "C901", "B007", "B904", "UP042"]  # line too long (not strict)
+
+[tool.ruff.lint.isort]
+known-first-party = ["services", "shared", "cad_mcp_bridge"]

@@ -1,10 +1,10 @@
 """ValidationEngine — validate CAD plans with 4-category checks."""
 
 from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import Optional
-from services.cadplan.engine import Plan
 
+from dataclasses import dataclass, field
+
+from services.cadplan.engine import Plan
 
 # ---------------------------------------------------------------------------
 # Data classes
@@ -16,7 +16,7 @@ class ValidationIssue:
     category: str       # completeness | consistency | executability | professional
     severity: str       # blocking | warning
     message: str
-    field: Optional[str] = None
+    field: str | None = None
 
 
 @dataclass
@@ -61,7 +61,7 @@ class ValidationEngine:
         category: str,
         severity: str,
         message: str,
-        field: Optional[str] = None,
+        field: str | None = None,
     ) -> None:
         issue = ValidationIssue(
             category=category,

@@ -1,9 +1,9 @@
 """CadComEngine — execute structured CAD Plans via the COM bridge."""
 
 from __future__ import annotations
+
 import logging
 from dataclasses import dataclass, field
-from typing import Optional
 
 from cad_mcp_bridge.cad_controller import CADController
 
@@ -34,7 +34,7 @@ class CadComEngine:
     """Execute CAD plans against a live AutoCAD instance via COM."""
 
     def __init__(self) -> None:
-        self._controller: Optional[CADController] = None
+        self._controller: CADController | None = None
 
     # -- connect / disconnect ------------------------------------------------
 

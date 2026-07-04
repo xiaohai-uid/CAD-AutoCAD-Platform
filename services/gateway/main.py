@@ -1,13 +1,22 @@
 """Gateway service — CAD Direct Control orchestrator"""
 from __future__ import annotations
-import sys
+
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from shared.models import CreateJobRequest, JobResponse, JobStatus, ConfirmRequest, ArtifactList
+
 from services.gateway.engine import OrchestratorEngine
+from shared.models import (
+    ArtifactList,
+    ConfirmRequest,
+    CreateJobRequest,
+    JobResponse,
+    JobStatus,
+)
 
 app = FastAPI(title="CAD Direct Control - Gateway", version="0.1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])

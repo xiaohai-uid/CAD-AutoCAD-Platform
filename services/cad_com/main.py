@@ -1,10 +1,13 @@
 """CAD COM service — interface with AutoCAD via COM"""
 from __future__ import annotations
-import sys
+
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from fastapi import FastAPI
+
 from shared.models import ExecutePlanRequest, JobResponse, JobStatus
 
 app = FastAPI(title="CAD COM Service", version="0.1.0")

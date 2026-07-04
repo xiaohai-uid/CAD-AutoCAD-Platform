@@ -1,11 +1,11 @@
 """IntakeEngine — parse natural language / file-based CAD requests."""
 from __future__ import annotations
+
 import os
 import re
 from dataclasses import dataclass, field
-from typing import Optional
-from shared.models import InputType
 
+from shared.models import InputType
 
 RECT_PATTERN = re.compile(r"(\d+)x(\d+)")
 DIAMETER_PATTERN = re.compile(r"\u03a6\s*(\d+(?:\.\d+)?)")
@@ -39,7 +39,7 @@ class ParsedContext:
 class IntakeEngine:
     """Parses user request strings into structured ParsedContext."""
 
-    def parse(self, text: str = "", files: Optional[list[str]] = None) -> ParsedContext:
+    def parse(self, text: str = "", files: list[str] | None = None) -> ParsedContext:
         ctx = ParsedContext()
 
         # --- Intent ---

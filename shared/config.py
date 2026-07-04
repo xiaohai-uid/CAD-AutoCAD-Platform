@@ -1,7 +1,9 @@
 """Configuration loader for CAD Direct Control Platform"""
 from __future__ import annotations
-import yaml
+
 from pathlib import Path
+
+import yaml
 
 CONFIG_PATH = Path(__file__).parent.parent / "config" / "config.yaml"
 

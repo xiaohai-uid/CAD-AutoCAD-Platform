@@ -4,8 +4,6 @@ from __future__ import annotations
 import math
 import os
 from dataclasses import dataclass, field
-from typing import List, Optional
-
 
 # ---------------------------------------------------------------------------
 # Detected primitives
@@ -57,13 +55,13 @@ class DetectedRect:
 @dataclass
 class VisionResult:
     """Result of an image analysis pass."""
-    lines: List[DetectedLine] = field(default_factory=list)
-    circles: List[DetectedCircle] = field(default_factory=list)
-    rects: List[DetectedRect] = field(default_factory=list)
+    lines: list[DetectedLine] = field(default_factory=list)
+    circles: list[DetectedCircle] = field(default_factory=list)
+    rects: list[DetectedRect] = field(default_factory=list)
     image_width: int = 0
     image_height: int = 0
     success: bool = False
-    error: Optional[str] = None
+    error: str | None = None
 
 
 # ---------------------------------------------------------------------------

@@ -3,8 +3,6 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Optional
-
 
 # ---------------------------------------------------------------------------
 # Data class
@@ -13,9 +11,9 @@ from typing import Optional
 @dataclass
 class PreviewResult:
     success: bool
-    file_path: Optional[str] = None
+    file_path: str | None = None
     format: str = "png"
-    error: Optional[str] = None
+    error: str | None = None
 
 
 # ---------------------------------------------------------------------------
