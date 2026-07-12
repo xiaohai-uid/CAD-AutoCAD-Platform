@@ -1,4 +1,4 @@
-"""Gateway service — CAD Direct Control HTTP orchestrator."""
+"""Gateway service - CAD Direct Control HTTP orchestrator."""
 from __future__ import annotations
 
 import os
@@ -18,7 +18,6 @@ from shared.models import (
 )
 
 app = FastAPI(title="CAD Direct Control - Gateway", version="0.1.0")
-
 engine = OrchestratorEngine()
 
 
@@ -29,7 +28,6 @@ async def health():
 
 @app.get("/health/services")
 async def health_services():
-    """Check all downstream services."""
     statuses = await engine.check_all_services()
     all_ok = all(statuses.values())
     return {"status": "ok" if all_ok else "degraded", "services": statuses}
@@ -50,7 +48,15 @@ async def get_job(job_id: str):
 
 @app.post("/job/{job_id}/confirm", response_model=JobResponse)
 async def confirm_job(job_id: str, req: ConfirmRequest):
-    resp = engine.confirm_job(job_id, req.confirmations)
+    resp = await engine.confirm_job(job_id, req.confirmations)
+    if resp is None:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return resp
+
+
+@app.post("/job/{job_id}/execute", response_model=JobResponse)
+async def execute_job(job_id: str):
+    resp = await engine.execute_job(job_id)
     if resp is None:
         raise HTTPException(status_code=404, detail="Job not found")
     return resp
@@ -59,6 +65,32 @@ async def confirm_job(job_id: str, req: ConfirmRequest):
 @app.get("/job/{job_id}/artifacts", response_model=ArtifactList)
 async def get_artifacts(job_id: str):
     return ArtifactList(job_id=job_id, status=JobStatus.completed, artifacts={})
+
+
+@app.get("/routes")
+async def get_routes():
+    return {
+        "routes": [
+            {"path": "/job/create", "method": "POST", "description": "Create a new CAD job"},
+            {"path": "/job/{job_id}", "method": "GET", "description": "Get job status"},
+            {"path": "/job/{job_id}/confirm", "method": "POST", "description": "Confirm job with user input"},
+            {"path": "/job/{job_id}/execute", "method": "POST", "description": "Execute a validated job"},
+            {"path": "/job/{job_id}/artifacts", "method": "GET", "description": "Get job artifacts"},
+            {"path": "/health", "method": "GET", "description": "Health check"},
+            {"path": "/health/services", "method": "GET", "description": "Check all downstream services"},
+            {"path": "/routes", "method": "GET", "description": "List all routes"},
+        ],
+        "downstream_services": {
+            "intake": "http://127.0.0.1:8001",
+            "vision": "http://127.0.0.1:8002",
+            "cadplan": "http://127.0.0.1:8003",
+            "validation": "http://127.0.0.1:8004",
+            "cad_com": "http://127.0.0.1:8005",
+            "preview": "http://127.0.0.1:8006",
+            "dwg_scan": "http://127.0.0.1:8007",
+            "artifacts": "http://127.0.0.1:8008",
+        },
+    }
 
 
 if __name__ == "__main__":

@@ -8,12 +8,16 @@ from pydantic import BaseModel
 
 class JobStatus(str, Enum):
     created = "created"
-    intake = "intake"
-    analyzing = "analyzing"
-    planning = "planning"
+    intake_pending = "intake_pending"
+    vision_pending = "vision_pending"
+    plan_pending = "plan_pending"
+    validation_pending = "validation_pending"
     draft_ready = "draft_ready"
     needs_confirmation = "needs_confirmation"
     executing = "executing"
+    saving = "saving"
+    preview_pending = "preview_pending"
+    archiving = "archiving"
     completed = "completed"
     error = "error"
 

@@ -43,6 +43,7 @@ CREATE_WORDS = {"draw", "create", "make", "add", "new", "build", "plot",
                 "画", "绘制", "创建", "新建", "添加", "生成"}
 EDIT_WORDS = {"edit", "modify", "change", "update", "adjust", "revise",
               "修改", "编辑", "调整", "更改", "更新"}
+OPEN_WORDS = {"open", "load", "read", "打开", "加载", "读取"}
 
 EXT_MAP: dict[str, InputType] = {
     ".png": InputType.image,
@@ -83,6 +84,8 @@ class IntakeEngine:
             ctx.intent = "create"
         elif first_word in EDIT_WORDS or any(w in EDIT_WORDS for w in words):
             ctx.intent = "edit"
+        elif first_word in OPEN_WORDS or any(w in OPEN_WORDS for w in words):
+            ctx.intent = "open"
 
         # --- Dimensions ---
         # Rectangles: "200x100" or "200 × 100"
