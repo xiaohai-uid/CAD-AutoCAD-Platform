@@ -1,11 +1,6 @@
 """Gateway service - CAD Direct Control HTTP orchestrator."""
 from __future__ import annotations
 
-import os
-import sys
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
 from fastapi import FastAPI, HTTPException
 
 from services.gateway.engine import OrchestratorEngine

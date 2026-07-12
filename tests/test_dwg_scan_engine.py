@@ -1,8 +1,4 @@
 """Tests for DwgScanEngine"""
-import os
-import sys
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from services.dwg_scan.engine import DwgContent, DwgEntity, DwgScanEngine
 
 # ---------------------------------------------------------------------------

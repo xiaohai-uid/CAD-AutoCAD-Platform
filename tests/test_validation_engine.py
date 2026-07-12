@@ -1,10 +1,5 @@
 """Tests for ValidationEngine"""
 
-import os
-import sys
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
 from services.cadplan.engine import CADPlanEngine, Plan, PlanEntity
 from services.validation.engine import (
     ValidationEngine,

@@ -1,9 +1,4 @@
 """Tests for Gateway OrchestratorEngine"""
-import os
-import sys
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
 from services.gateway.engine import OrchestratorEngine
 from shared.models import CreateJobRequest, InputType, JobStatus, OutputLevel
 

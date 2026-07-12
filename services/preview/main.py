@@ -1,11 +1,6 @@
 """Preview service — generate visual previews via cad_com proxy (no direct COM)."""
 from __future__ import annotations
 
-import os
-import sys
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
-
 import httpx
 from fastapi import FastAPI
 
