@@ -75,7 +75,7 @@ async def com_status():
 
 
 @app.post("/cad_com/screenshot", response_model=PreviewResponse)
-async def com_screenshot(req: ScreenshotRequest):
+async def com_screenshot(req: PreviewRequest):
     """Take a screenshot of the current AutoCAD viewport."""
     from services.preview.engine import PreviewEngine
     pe = PreviewEngine()
@@ -89,7 +89,7 @@ async def com_screenshot(req: ScreenshotRequest):
 
 
 @app.post("/cad_com/export_pdf", response_model=PreviewResponse)
-async def com_export_pdf(req: ScreenshotRequest):
+async def com_export_pdf(req: PreviewRequest):
     """Export the current AutoCAD drawing to PDF."""
     from services.preview.engine import PreviewEngine
     pe = PreviewEngine()
