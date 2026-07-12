@@ -37,7 +37,7 @@ Before creating bug reports, please check the existing issues to avoid duplicate
 2. Create a feature branch: `git checkout -b feature/your-feature`
 3. Make your changes
 4. Run tests: `pytest tests/ -v`
-5. Ensure all tests pass (38 tests should all pass)
+5. Ensure all tests pass (55 tests should all pass)
 6. Commit your changes: `git commit -am 'Add feature'`
 7. Push to the branch: `git push origin feature/your-feature`
 8. Submit a pull request
@@ -92,7 +92,7 @@ pytest tests/ -v
 │   ├── artifacts/      工件持久化管理
 │   └── gateway/        编排网关
 ├── shared/             共享模型和配置
-├── tests/              38 个单元测试
+├── tests/              55 个单元测试
 └── skill/              Reasonix Subagent Skill
 ```
 

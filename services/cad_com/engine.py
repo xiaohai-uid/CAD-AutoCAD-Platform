@@ -197,9 +197,12 @@ class CadComEngine:
         )
 
     def _draw_dimension(self, dim) -> None:
+        # Ensure 3D coordinates (pad to 3 elements if needed)
+        sp = list(dim.point1) + [0.0] * (3 - len(dim.point1)) if hasattr(dim.point1, '__len__') else (0.0, 0.0, 0.0)
+        ep = list(dim.point2) + [0.0] * (3 - len(dim.point2)) if hasattr(dim.point2, '__len__') else (0.0, 0.0, 0.0)
         self._controller.add_dimension(
-            start_point=dim.point1,
-            end_point=dim.point2,
+            start_point=(sp[0], sp[1], sp[2]),
+            end_point=(ep[0], ep[1], ep[2]),
             text_position=None,
             textheight=5,
         )
