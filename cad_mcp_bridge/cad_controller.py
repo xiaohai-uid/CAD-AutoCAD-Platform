@@ -55,21 +55,7 @@ class CADController:
 
             try:
                 # 根据配置的CAD类型选择不同的应用程序标识符
-                app_id = "AutoCAD.Application"
-                app_name = "AutoCAD"
-
-                if self.cad_type.lower() == "autocad":
-                    app_id = "AutoCAD.Application"
-                    app_name = "AutoCAD"
-                elif self.cad_type.lower() == "gcad":
-                    app_id = "GCAD.Application"
-                    app_name = "浩辰CAD"
-                elif self.cad_type.lower() == "gstarcad":
-                    app_id = "GCAD.Application"
-                    app_name = "浩辰CAD"
-                elif self.cad_type.lower() == "zwcad":
-                    app_id = "ZWCAD.Application"
-                    app_name = "中望CAD"
+                app_id, app_name = self._resolve_cad_app(self.cad_type)
 
                 # 尝试连接到已运行的CAD实例
                 logger.info("尝试连接现有%s实例...", app_name)
@@ -114,21 +100,7 @@ class CADController:
                 logger.info("连接失败，正在启动新的CAD实例: %s", str(app_ex))
                 try:
                     # 根据配置的CAD类型启动相应的应用程序
-                    app_id = "AutoCAD.Application"
-                    app_name = "AutoCAD"
-
-                    if self.cad_type.lower() == "autocad":
-                        app_id = "AutoCAD.Application"
-                        app_name = "AutoCAD"
-                    elif self.cad_type.lower() == "gcad":
-                        app_id = "GCAD.Application"
-                        app_name = "浩辰CAD"
-                    elif self.cad_type.lower() == "gstarcad":
-                        app_id = "GCAD.Application"
-                        app_name = "浩辰CAD"
-                    elif self.cad_type.lower() == "zwcad":
-                        app_id = "ZWCAD.Application"
-                        app_name = "中望CAD"
+                    app_id, app_name = self._resolve_cad_app(self.cad_type)
 
                     logger.info("正在启动%s实例...", app_name)
                     self.app = win32com.client.Dispatch(app_id)
