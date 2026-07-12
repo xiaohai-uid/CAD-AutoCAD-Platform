@@ -39,22 +39,10 @@ async def health():
 @app.post("/cad_com/execute", response_model=ExecuteResponse)
 async def execute_plan(body: ExecuteRequestBody):
     """Execute a CAD plan against AutoCAD via COM."""
-    # Rebuild Plan from PlanResponse
-    from services.cadplan.engine import Plan, PlanDimension, PlanEntity, PlanLayer
+    # Rebuild Plan from PlanResponse using shared converter
+    from shared.converters import plan_from_response
 
-    plan = Plan(
-        output_level=body.plan.output_level,
-        unit=body.plan.unit,
-        assumptions=list(body.plan.assumptions),
-        warnings=list(body.plan.warnings),
-    )
-    for l in body.plan.layers:
-        plan.layers.append(PlanLayer(name=l.name, color=l.color, lineweight=l.lineweight, description=l.description))
-    for e in body.plan.entities:
-        plan.entities.append(PlanEntity(type=e.type, params=dict(e.params), layer=e.layer, depends_on=list(e.depends_on)))
-    for d in body.plan.dimensions:
-        plan.dimensions.append(PlanDimension(type=d.type, point1=list(d.point1), point2=list(d.point2), text=d.text))
-    plan.texts = list(body.plan.texts)
+    plan = plan_from_response(body.plan)
 
     result = engine.execute_plan(plan)
     return ExecuteResponse(
