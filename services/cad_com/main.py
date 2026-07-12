@@ -106,6 +106,26 @@ async def com_scan_dwg(req: DwgScanRequest):
     )
 
 
+
+@app.post("/cad_com/save")
+async def com_save(req: SaveRequest):
+    """Save the current AutoCAD drawing."""
+    success = engine.save(req.path)
+    return {"success": success, "path": req.path, "job_id": req.job_id}
+
+
+@app.post("/cad_com/connect")
+async def com_connect():
+    """Connect to a running AutoCAD instance."""
+    ok = engine.connect()
+    return {"connected": ok, "version": "AutoCAD" if ok else None}
+
+
+@app.get("/cad_com/status")
+async def com_status():
+    return {"connected": engine.is_connected, "available": True}
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8005)

@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from fastapi import FastAPI, HTTPException
 
 from services.gateway.engine import OrchestratorEngine
+from shared.config import get_service_url
 from shared.models import (
     ArtifactList,
     ConfirmRequest,
@@ -16,6 +17,9 @@ from shared.models import (
     JobResponse,
     JobStatus,
 )
+
+import logging
+logger = logging.getLogger("gateway_main")
 
 app = FastAPI(title="CAD Direct Control - Gateway", version="0.1.0")
 engine = OrchestratorEngine()
@@ -64,6 +68,14 @@ async def execute_job(job_id: str):
 
 @app.get("/job/{job_id}/artifacts", response_model=ArtifactList)
 async def get_artifacts(job_id: str):
+    """Get job artifacts from the Artifacts service."""
+    try:
+        art_url = f"{get_service_url('artifacts')}/artifacts/{job_id}"
+        resp = await engine.client.get(art_url, timeout=5.0)
+        if resp.status_code == 200:
+            return ArtifactList(**resp.json())
+    except Exception as e:
+        logger.warning("Artifact service call failed: %s", e)
     return ArtifactList(job_id=job_id, status=JobStatus.completed, artifacts={})
 
 
