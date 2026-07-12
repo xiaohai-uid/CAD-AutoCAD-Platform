@@ -8,37 +8,31 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from fastapi import FastAPI
 
-from shared.models import IntakeRequest, JobResponse, JobStatus
+from services.intake.engine import IntakeEngine
+from shared.models import IntakeRequest, IntakeResponse
 
 app = FastAPI(title="Intake Service", version="0.1.0")
+engine = IntakeEngine()
+
 
 @app.get("/health")
 async def health():
     return {"status": "ok", "service": "intake"}
 
-@app.post("/intake/parse", response_model=JobResponse)
+
+@app.post("/intake/parse", response_model=IntakeResponse)
 async def parse_request(req: IntakeRequest):
-    # Parse input type and extract intent
-    input_type = req.input_type
-    word_count = len(req.user_request.split())
+    ctx = engine.parse(req.user_request, req.files)
+    return IntakeResponse(
+        intent=ctx.intent,
+        input_type=ctx.input_type.value if hasattr(ctx.input_type, 'value') else str(ctx.input_type),
+        dimensions=ctx.dimensions,
+        unit=ctx.unit,
+        description=ctx.description,
+        files_valid=ctx.files_valid,
+        needs_more_info=ctx.needs_more_info,
+    )
 
-    # Basic heuristic parsing
-    has_draw = any(w in req.user_request.lower() for w in ["draw", "create", "make", "add"])
-    has_edit = any(w in req.user_request.lower() for w in ["edit", "modify", "change", "update"])
-
-    intent = "create" if has_draw else "edit" if has_edit else "unknown"
-
-    return {
-        "job_id": "",
-        "status": JobStatus.intake,
-        "next_action": "/vision/analyze",
-        "assumptions": [
-            {"key": "intent", "value": intent},
-            {"key": "input_type", "value": input_type.value},
-            {"key": "word_count", "value": str(word_count)},
-        ],
-        "questions": [] if word_count > 3 else ["Please provide more details about what you want to create."],
-    }
 
 if __name__ == "__main__":
     import uvicorn

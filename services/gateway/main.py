@@ -1,4 +1,4 @@
-"""Gateway service — CAD Direct Control orchestrator"""
+"""Gateway service — CAD Direct Control HTTP orchestrator."""
 from __future__ import annotations
 
 import os
@@ -7,7 +7,6 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 
 from services.gateway.engine import OrchestratorEngine
 from shared.models import (
@@ -19,17 +18,27 @@ from shared.models import (
 )
 
 app = FastAPI(title="CAD Direct Control - Gateway", version="0.1.0")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 engine = OrchestratorEngine()
+
 
 @app.get("/health")
 async def health():
     return {"status": "ok", "service": "gateway"}
 
+
+@app.get("/health/services")
+async def health_services():
+    """Check all downstream services."""
+    statuses = await engine.check_all_services()
+    all_ok = all(statuses.values())
+    return {"status": "ok" if all_ok else "degraded", "services": statuses}
+
+
 @app.post("/job/create", response_model=JobResponse)
 async def create_job(req: CreateJobRequest):
-    return engine.create_job(req)
+    return await engine.create_job(req)
+
 
 @app.get("/job/{job_id}", response_model=JobResponse)
 async def get_job(job_id: str):
@@ -38,12 +47,14 @@ async def get_job(job_id: str):
         raise HTTPException(status_code=404, detail="Job not found")
     return resp
 
+
 @app.post("/job/{job_id}/confirm", response_model=JobResponse)
 async def confirm_job(job_id: str, req: ConfirmRequest):
     resp = engine.confirm_job(job_id, req.confirmations)
     if resp is None:
         raise HTTPException(status_code=404, detail="Job not found")
     return resp
+
 
 @app.get("/job/{job_id}/artifacts", response_model=ArtifactList)
 async def get_artifacts(job_id: str):

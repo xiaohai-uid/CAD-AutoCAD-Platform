@@ -1,14 +1,16 @@
-import json
 import logging
 import math
 import os
 import time
 from typing import Any
 
-# 直接读取config.json文件
-config_path = os.path.join(os.path.dirname(__file__), 'config.json')
-with open(config_path, encoding='utf-8') as f:
-    config = json.load(f)
+# 从统一配置系统读取
+import sys
+_sys_path = os.path.join(os.path.dirname(__file__), '..')
+if _sys_path not in sys.path:
+    sys.path.insert(0, _sys_path)
+from shared.config import get_cad_config  # noqa: E402
+config = get_cad_config()
 
 try:
     # pythoncom是pywin32的一部分，不需要单独安装

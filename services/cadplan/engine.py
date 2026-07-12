@@ -1,5 +1,4 @@
 """CADPlanEngine — generate structured CAD execution plans from natural language."""
-
 from __future__ import annotations
 
 import re
@@ -64,19 +63,45 @@ DEFAULT_LAYERS: list[PlanLayer] = [
 ]
 
 # ---------------------------------------------------------------------------
-# Regex patterns
+# Regex patterns — single-entity matchers
 # ---------------------------------------------------------------------------
 
 RECT_PATTERN = re.compile(
-    r"(?:draw\s+)?(?:a\s+|an\s+)?(?P<width>\d+(?:\.\d+)?)\s*[xX×]\s*(?P<height>\d+(?:\.\d+)?)\s*(?:rectangle)?",
+    r"(?:(?:draw|create|make|add)\s+)?(?:a\s+|an\s+)?"
+    r"(?P<width>\d+(?:\.\d+)?)\s*[xX×]\s*(?P<height>\d+(?:\.\d+)?)"
+    r"\s*(?:rectangle|rect)?",
     re.IGNORECASE,
 )
-RADIUS_PATTERN = re.compile(
-    r"(?:circle|radius)\s*(?:radius\s+)?(?P<radius>\d+(?:\.\d+)?)",
+CIRCLE_RADIUS_PATTERN = re.compile(
+    r"(?:circle|円|圆)\s*(?:with\s+)?(?:radius|r|半径)\s*(?:of\s+)?(?P<radius>\d+(?:\.\d+)?)",
     re.IGNORECASE,
 )
-DIAMETER_PATTERN = re.compile(
-    r"(?:diameter|dia)\s*(?:diameter\s+)?(?P<diameter>\d+(?:\.\d+)?)",
+CIRCLE_DIAMETER_PATTERN = re.compile(
+    r"(?:circle|円|圆)\s*(?:with\s+)?(?:diameter|dia|d|直径)\s*(?:of\s+)?(?P<diameter>\d+(?:\.\d+)?)",
+    re.IGNORECASE,
+)
+# "Φ30" / "phi30" / "直径30" patterns
+PHI_PATTERN = re.compile(
+    r"(?:[Φφϕ]|phi|直径)\s*(?P<diameter>\d+(?:\.\d+)?)",
+    re.IGNORECASE,
+)
+LINE_PATTERN = re.compile(
+    r"(?:line|直线|线)\s+(?:from\s+)?"
+    r"\(?\s*(?P<x1>-?\d+(?:\.\d+)?)\s*[,，]\s*(?P<y1>-?\d+(?:\.\d+)?)\s*\)?"
+    r"(?:\s+to\s+|\s*[,，]\s*)"
+    r"\(?\s*(?P<x2>-?\d+(?:\.\d+)?)\s*[,，]\s*(?P<y2>-?\d+(?:\.\d+)?)\s*\)?",
+    re.IGNORECASE,
+)
+ARC_PATTERN = re.compile(
+    r"(?:arc|弧|圆弧)\s+(?:center|圆心|中心)\s*\(?\s*(?P<cx>-?\d+(?:\.\d+)?)\s*[,，]\s*(?P<cy>-?\d+(?:\.\d+)?)\s*\)?"
+    r"\s+(?:radius|r|半径)\s*(?:of\s+)?(?P<radius>\d+(?:\.\d+)?)"
+    r"(?:\s+(?:from|start|起始)\s*(?P<start_angle>-?\d+(?:\.\d+)?))?"
+    r"(?:\s+(?:to|end|结束)\s*(?P<end_angle>-?\d+(?:\.\d+)?))?",
+    re.IGNORECASE,
+)
+POLYLINE_PATTERN = re.compile(
+    r"(?:polyline|多段线|pline)\s+(?:points|点|pts)\s*"
+    r"\[(?P<points>[\d\s,.\-()]+)\]",
     re.IGNORECASE,
 )
 
@@ -86,7 +111,11 @@ DIAMETER_PATTERN = re.compile(
 # ---------------------------------------------------------------------------
 
 class CADPlanEngine:
-    """Parse natural-language CAD requests into structured Plans."""
+    """Parse natural-language CAD requests into structured Plans.
+
+    Supports multiple entities per request. The parser scans the text for
+    ALL recognized patterns and adds each found entity to the plan.
+    """
 
     def generate_from_text(
         self,
@@ -100,88 +129,112 @@ class CADPlanEngine:
             unit=unit,
         )
 
-        # Try rectangle
-        m = RECT_PATTERN.search(text)
-        if m:
+        found_any = False
+
+        # 1. Rectangles
+        for m in RECT_PATTERN.finditer(text):
             width = float(m.group("width"))
             height = float(m.group("height"))
             self._add_rectangle(plan, width, height)
-            if output_level == "professional_dwg":
-                self._add_rectangle_dimensions(plan, width, height)
-            return plan
 
-        # Try radius
-        m = RADIUS_PATTERN.search(text)
-        if m:
+            if "horizontal" in text.lower() or "垂直" in text:
+                plan.assumptions.append({"key": "orientation", "value": "vertical"})
+            found_any = True
+
+        # 2. Circles by radius
+        for m in CIRCLE_RADIUS_PATTERN.finditer(text):
             radius = float(m.group("radius"))
             self._add_circle(plan, radius)
-            if output_level == "professional_dwg":
-                self._add_circle_dimensions(plan, radius)
-            return plan
+            found_any = True
 
-        # Try diameter
-        m = DIAMETER_PATTERN.search(text)
-        if m:
+        # 3. Circles by diameter
+        for m in CIRCLE_DIAMETER_PATTERN.finditer(text):
             radius = float(m.group("diameter")) / 2.0
             self._add_circle(plan, radius)
-            if output_level == "professional_dwg":
-                self._add_circle_dimensions(plan, radius)
-            return plan
+            found_any = True
 
-        plan.warnings.append(f"Could not parse request: {text!r}")
+        # 4. Φ/phi diameter shorthand
+        for m in PHI_PATTERN.finditer(text):
+            radius = float(m.group("diameter")) / 2.0
+            self._add_circle(plan, radius)
+            found_any = True
+
+        # 5. Lines
+        for m in LINE_PATTERN.finditer(text):
+            x1, y1 = float(m.group("x1")), float(m.group("y1"))
+            x2, y2 = float(m.group("x2")), float(m.group("y2"))
+            plan.entities.append(PlanEntity(
+                type="line",
+                params={"x1": x1, "y1": y1, "z1": 0, "x2": x2, "y2": y2, "z2": 0},
+                layer="轮廓线",
+            ))
+            found_any = True
+
+        # 6. Arcs
+        for m in ARC_PATTERN.finditer(text):
+            cx = float(m.group("cx"))
+            cy = float(m.group("cy"))
+            radius = float(m.group("radius")) if m.group("radius") else 10.0
+            start_angle = float(m.group("start_angle")) if m.group("start_angle") is not None else 0.0
+            end_angle = float(m.group("end_angle")) if m.group("end_angle") is not None else 90.0
+            plan.entities.append(PlanEntity(
+                type="arc",
+                params={
+                    "cx": cx, "cy": cy, "radius": radius,
+                    "start_angle": start_angle, "end_angle": end_angle,
+                },
+                layer="轮廓线",
+            ))
+            found_any = True
+
+        # 7. Add dimensions for professional_dwg
+        if output_level == "professional_dwg" and found_any:
+            self._add_dimensions(plan)
+
+        if not found_any:
+            plan.warnings.append(f"Could not parse request: {text!r}")
+
         return plan
 
     # -- helpers -----------------------------------------------------------
 
-    def _add_rectangle(self, plan: Plan, width: float, height: float, x: float = 0.0, y: float = 0.0) -> None:
-        entity = PlanEntity(
+    def _add_rectangle(self, plan: Plan, width: float, height: float,
+                       x: float = 0.0, y: float = 0.0) -> None:
+        plan.entities.append(PlanEntity(
             type="rectangle",
-            params={
-                "width": width,
-                "height": height,
-                "x": x,
-                "y": y,
-            },
+            params={"width": width, "height": height, "x": x, "y": y},
             layer="轮廓线",
-        )
-        plan.entities.append(entity)
+        ))
 
-    def _add_rectangle_dimensions(self, plan: Plan, width: float, height: float, x: float = 0.0, y: float = 0.0) -> None:
-        plan.dimensions.append(
-            PlanDimension(
-                type="linear",
-                point1=[x, y, 0],
-                point2=[x + width, y, 0],
-                text=str(width),
-            )
-        )
-        plan.dimensions.append(
-            PlanDimension(
-                type="linear",
-                point1=[x, y, 0],
-                point2=[x, y + height, 0],
-                text=str(height),
-            )
-        )
-
-    def _add_circle(self, plan: Plan, radius: float, cx: float = 0.0, cy: float = 0.0) -> None:
-        entity = PlanEntity(
+    def _add_circle(self, plan: Plan, radius: float,
+                    cx: float = 0.0, cy: float = 0.0) -> None:
+        plan.entities.append(PlanEntity(
             type="circle",
-            params={
-                "radius": radius,
-                "cx": cx,
-                "cy": cy,
-            },
+            params={"radius": radius, "cx": cx, "cy": cy},
             layer="轮廓线",
-        )
-        plan.entities.append(entity)
+        ))
 
-    def _add_circle_dimensions(self, plan: Plan, radius: float, cx: float = 0.0, cy: float = 0.0) -> None:
-        plan.dimensions.append(
-            PlanDimension(
-                type="radius",
-                point1=[cx, cy, 0],
-                point2=[cx + radius, cy, 0],
-                text=f"R{radius}",
-            )
-        )
+    def _add_dimensions(self, plan: Plan) -> None:
+        """Add dimensions for all entities in the plan."""
+        for entity in plan.entities:
+            if entity.type == "rectangle":
+                w = entity.params.get("width", 0)
+                h = entity.params.get("height", 0)
+                x = entity.params.get("x", 0)
+                y = entity.params.get("y", 0)
+                plan.dimensions.append(PlanDimension(
+                    type="linear",
+                    point1=[x, y, 0], point2=[x + w, y, 0], text=str(w),
+                ))
+                plan.dimensions.append(PlanDimension(
+                    type="linear",
+                    point1=[x, y, 0], point2=[x, y + h, 0], text=str(h),
+                ))
+            elif entity.type == "circle":
+                cx = entity.params.get("cx", 0)
+                cy = entity.params.get("cy", 0)
+                r = entity.params.get("radius", 0)
+                plan.dimensions.append(PlanDimension(
+                    type="radius",
+                    point1=[cx, cy, 0], point2=[cx + r, cy, 0], text=f"R{r}",
+                ))
