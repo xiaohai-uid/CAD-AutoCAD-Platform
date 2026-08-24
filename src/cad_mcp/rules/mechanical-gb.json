@@ -1,0 +1,11 @@
+{
+  "id": "mechanical-gb",
+  "description": "机械制图简化检查包（参照 GB/T 14665 思路，种子版）",
+  "rules": [
+    {"code":"M-001","severity":"warning","check":"required_layers","params":{"names":["轮廓线","中心线"]}},
+    {"code":"M-002","severity":"error","check":"positive_params","params":{"fields":["radius","width","height","diameter"]}},
+    {"code":"M-003","severity":"warning","check":"min_text_height","params":{"min":2.5}},
+    {"code":"M-004","severity":"warning","check":"no_circle_without_centerlayer","params":{}},
+    {"code":"M-005","severity":"warning","check":"title_block_present","params":{"keywords":["图号"]}}
+  ]
+}

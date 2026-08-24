@@ -1,0 +1,9 @@
+{
+  "id": "architectural-gb-seed",
+  "description": "建筑制图种子包（GB/T 50001 思路，示例性规则，需专业校准）",
+  "rules": [
+    {"code":"A-001","severity":"warning","check":"required_layers","params":{"names":["轴线","墙体","尺寸"]}},
+    {"code":"A-002","severity":"error","check":"positive_params","params":{"fields":["width","height"]}},
+    {"code":"A-003","severity":"warning","check":"min_text_height","params":{"min":3.5}}
+  ]
+}

@@ -1,74 +1,10 @@
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
 [project]
-name = "cad-direct-control-platform"
+name = "cad-mcp"
 version = "0.1.0"
-description = "AutoCAD 2026 直连自动化多进程微服务平台 — 从自然语言、图片、PDF、DWG 到 AutoCAD 绘图的全链路自动化"
-readme = "README.md"
-license = {text = "MIT"}
-authors = [
-    {name = "CAD Direct Control Platform Contributors"}
-]
-keywords = ["autocad", "cad", "automation", "microservices", "fastapi"]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: Microsoft :: Windows",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-]
-requires-python = ">=3.11"
-dependencies = [
-    "fastapi>=0.137.2",
-    "uvicorn[standard]>=0.49.0",
-    "httpx>=0.28.1",
-    "pydantic>=2.11.7",
-    "pydantic-settings>=2.14.1",
-    "opencv-python>=4.13.0.92",
-    "pywin32>=312",
-]
-
-[project.optional-dependencies]
-dev = [
-    "pytest>=8.0",
-    "pytest-asyncio>=0.23",
-    "coverage>=7.0",
-    "ruff>=0.1",
-]
-test = [
-    "pytest>=8.0",
-    "pytest-asyncio>=0.23",
-    "coverage>=7.0",
-]
-
-[project.urls]
-Homepage = "https://github.com/xiaohai-uid/CAD-AutoCAD-Platform"
-Documentation = "https://github.com/xiaohai-uid/CAD-AutoCAD-Platform#readme"
-Repository = "https://github.com/xiaohai-uid/CAD-AutoCAD-Platform"
-Issues = "https://github.com/xiaohai-uid/CAD-AutoCAD-Platform/issues"
-
-[tool.setuptools.packages.find]
-include = ["services*", "shared*", "cad_mcp_bridge*"]
+description = "AutoCAD live-control MCP server (stdio) driven by DSH agent"
+requires-python = ">=3.12"
+dependencies = ["mcp>=1.0", "pywin32>=306 ; sys_platform == 'win32'"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_functions = ["test_*"]
-addopts = "-v"
-
-# Ruff configuration
-[tool.ruff]
-target-version = "py311"
-exclude = [".venv", ".git", "__pycache__", ".pytest_cache", ".superpowers", "build", "dist"]
-
-[tool.ruff.lint]
-select = ["E", "F", "W", "I", "UP", "B"]
-ignore = ["E501", "C901", "B007", "B904", "UP042"]  # line too long (not strict)
-
-[tool.ruff.lint.isort]
-known-first-party = ["services", "shared", "cad_mcp_bridge"]
+markers = ["com: 需要真实 AutoCAD 的集成测试（默认不在单测集）"]

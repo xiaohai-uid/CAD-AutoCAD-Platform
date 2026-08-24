@@ -1,0 +1,9 @@
+{
+  "id": "chemical-pid-seed",
+  "description": "化工 PID 种子包（符号/管线分层思路，示例性规则，需专业校准）",
+  "rules": [
+    {"code":"C-001","severity":"warning","check":"required_layers","params":{"names":["管线","仪表","设备"]}},
+    {"code":"C-002","severity":"warning","check":"min_text_height","params":{"min":2.5}},
+    {"code":"C-003","severity":"error","check":"positive_params","params":{"fields":["radius","diameter"]}}
+  ]
+}

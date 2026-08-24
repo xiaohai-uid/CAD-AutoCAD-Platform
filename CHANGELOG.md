@@ -1,38 +1,30 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+## v2.0.0 (2026-08-24)
 
-## [0.1.0] - 2026-07-03
+**完全重构**：从九引擎微服务平台重构为单进程 MCP 服务。
 
-### Added
-- 9 microservices architecture with FastAPI
-  - Gateway (port 8000) - 11-step workflow orchestrator
-  - Intake (port 8001) - NLP parsing engine
-  - Vision (port 8002) - OpenCV image recognition
-  - CADPlan (port 8003) - CAD execution plan generator
-  - Validation (port 8004) - 4-type validation engine
-  - CAD COM (port 8005) - COM execution bridge
-  - Preview (port 8006) - Screenshot/PDF export
-  - DWG Scan (port 8007) - DWG file scanner
-  - Artifacts (port 8008) - SQLite artifact persistence
-- Natural language input support (Chinese/English)
-- Image/PDF geometry recognition
-- Intelligent CAD planning with 5-layer assignment
-- 4-type validation (completeness/consistency/executability/professional)
-- 38 unit tests covering all engines
-- OpenSpec specifications for all services
-- Reasonix Subagent Skill integration
+### 新增
+- 44 个 MCP 工具（绘图/标注/填充/参数化生成器/视觉闭环/理解规划流水线）
+- Plan-Validate-Execute 三段式（Plan 含 assumptions/warnings 透传）
+- 行业规则包引擎（mechanical-gb 内置 + JSON 外置扩展）
+- 写防重放语义（write_safe）
+- 可疑态熔断 + 泄漏上限
+- 结构化 JSONL 日志双通道
+- --read-only 模式
+- 浸泡测试框架（ctypes 内存/GDI 采样）
+- 冒烟套件（六检查，exit 码化）
 
-### Security
-- Parameterized SQL queries (SQLite)
-- yaml.safe_load for secure YAML parsing
-- No hardcoded secrets or credentials
+### 移除
+- 九微服务架构（Gateway/Intake/Vision/CADPlan/Validation/CAD-COM/Preview/DWG-Scan/Artifacts）
+- Docker/docker-compose 部署（MCP stdio 不需要容器化）
+- HTTP REST 端点
 
-### Documentation
-- Comprehensive README with architecture diagram
-- CONTRIBUTING.md guidelines
-- CODE_OF_CONDUCT.md
-- OpenSpec design documents
-- API endpoint examples
+### 设计决策
+- 微服务 → 单进程：COM 唯一拥有者原则在进程内以 ComExecutor 单线程实现，
+  消除跨进程 COM 序列化的全部复杂度
+- 正则解析器从 Intake 引擎移植，Plan 模型从 CADPlanEngine 继承——
+  九引擎的思想精华保留，架构按 MCP 语境重构
 
-[0.1.0]: https://github.com/daobataotie/cad-direct-control-platform/releases/tag/v0.1.0
+## v1.0.0 (2026-07)
+前作九引擎微服务平台原型。
