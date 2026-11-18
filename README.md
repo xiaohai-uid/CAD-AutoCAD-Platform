@@ -6,10 +6,11 @@
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-80%20passing-brightgreen.svg)]()
-[![Tools](https://img.shields.io/badge/tools-44-9cf.svg)()]
+[查看测试](tests/) · [兼容性说明](COMPATIBILITY.md)
 
 ---
+
+For an example of the output, open the [A3 gearbox assembly drawing](docs/img/reducer_assembly_A3.jpg) and the [dimensioned output shaft](docs/img/shaft_industrial.jpg). You can inspect both drawings in your browser. To generate drawings locally, the bridge requires a running full installation of AutoCAD 2026 on Windows.
 
 ## 实际产出
 
@@ -74,10 +75,12 @@ pip install fastmcp mcp pywin32 pillow pytest
 
 ### 30 秒验证
 ```bash
-# 确保 AutoCAD 已打开且有活动图纸
+# 在 AutoCAD 2026 中新建一张空白测试图纸并保持活动，再从仓库根目录执行
 python src/cad_mcp/smoke_suite.py
-# 输出 ALL PASS 即可开始用自然语言指挥 AI 画图
+# 检查输出中的逐项 PASS / FAIL
 ```
+
+冒烟脚本会初始化图纸、绘制测试图元、调用撤销并导出截图。使用空白测试图可以直接对照结果。只想先看输出质量，可查看[减速器装配图](docs/img/reducer_assembly_A3.jpg)或[输出轴公差细节](docs/img/shaft_v2_tolerance.jpg)。
 
 ## 44 个工具一览
 
