@@ -10,6 +10,8 @@
 
 ---
 
+For an example of the output, open the [A3 gearbox assembly drawing](docs/img/reducer_assembly_A3.jpg) and the [dimensioned output shaft](docs/img/shaft_industrial.jpg). You can inspect both drawings in your browser. To generate drawings locally, the bridge requires a running full installation of AutoCAD 2026 on Windows.
+
 ## 实际产出
 
 ### 一级圆柱齿轮减速器装配图（A3 · 251 实体）
